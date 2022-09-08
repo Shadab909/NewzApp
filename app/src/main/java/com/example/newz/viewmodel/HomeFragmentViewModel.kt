@@ -13,6 +13,7 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class HomeFragmentViewModel : ViewModel() {
+
     private val apiKey = "87bb7a661afb4c2a8c962e6e0d8381a2"
     private var newsListData : MutableLiveData<List<Article>> = MutableLiveData()
 

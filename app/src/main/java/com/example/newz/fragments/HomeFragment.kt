@@ -2,13 +2,10 @@ package com.example.newz.fragments
 
 import android.content.Intent
 import android.net.Uri
-import android.opengl.Visibility
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.RenderProcessGoneDetail
 import android.widget.PopupMenu
 import android.widget.Toast
 import androidx.browser.customtabs.CustomTabsIntent
@@ -17,19 +14,23 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.newz.R
-import com.example.newz.adapters.CategoryAdapter
-import com.example.newz.adapters.CategoryClickListener
 import com.example.newz.adapters.NewsItemClicked
 import com.example.newz.adapters.NewsListAdapter
 import com.example.newz.databinding.FragmentHomeBinding
 import com.example.newz.model.Article
+import com.example.newz.model.BookMarkNews
+import com.example.newz.model.BookMarkNewsSource
+import com.example.newz.util.MyUtil
 import com.example.newz.viewmodel.HomeFragmentViewModel
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.ktx.database
+import com.google.firebase.ktx.Firebase
 
 
-class HomeFragment : Fragment() , NewsItemClicked , CategoryClickListener {
+class HomeFragment : Fragment() , NewsItemClicked  {
     private lateinit var binding: FragmentHomeBinding
-    private lateinit var mCategoryAdapter: CategoryAdapter
     private lateinit var mNewsListAdapter: NewsListAdapter
+    private lateinit var viewModel: HomeFragmentViewModel
 
 
     override fun onCreateView(
@@ -37,16 +38,36 @@ class HomeFragment : Fragment() , NewsItemClicked , CategoryClickListener {
         savedInstanceState: Bundle?
     ): View? {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_home, container, false)
-        mCategoryAdapter = CategoryAdapter(this)
         mNewsListAdapter = NewsListAdapter(this)
-        initCategoryRecyclerView()
-        val category = "entertainment"
+        viewModel = ViewModelProvider(this)[HomeFragmentViewModel::class.java]
+        val position = requireArguments().getInt("position")
+        val category = getCategory(position)
         val country = "in"
         initNewsRecyclerview()
-        getData(country,category)
+        showData(category, country)
+
+        binding.swipeRefresh.setOnRefreshListener {
+            showData(category, country)
+            binding.swipeRefresh.isRefreshing = false;
+        }
+
+
         return binding.root
     }
 
+    private fun showData(category : String , country : String )
+    {
+        if(MyUtil.isInternetAvailable(requireContext())){
+            binding.noInternet.visibility = View.GONE
+            binding.newsListRv.visibility = View.VISIBLE
+            getData(country,category)
+        }else{
+            binding.noInternet.visibility = View.VISIBLE
+            binding.spinKit.visibility = View.GONE
+            binding.newsListRv.visibility = View.GONE
+
+        }
+    }
     private fun initNewsRecyclerview(){
         binding.newsListRv.apply {
             layoutManager = LinearLayoutManager(context)
@@ -58,7 +79,6 @@ class HomeFragment : Fragment() , NewsItemClicked , CategoryClickListener {
     private fun getData(country : String ,category : String){
         binding.spinKit.visibility = View.VISIBLE
         binding.newsListRv.visibility = View.GONE
-        val viewModel = ViewModelProvider(this)[HomeFragmentViewModel::class.java]
         viewModel.getNewsListDataObserver().observe(viewLifecycleOwner) {
 
             mNewsListAdapter.submitList(it) {
@@ -69,24 +89,6 @@ class HomeFragment : Fragment() , NewsItemClicked , CategoryClickListener {
             binding.spinKit.visibility = View.GONE
         }
         viewModel.makeApiCall(country,category)
-    }
-
-    private fun initCategoryRecyclerView() {
-        val categoryList = listOf(
-            "entertainment",
-            "general",
-            "health",
-            "business",
-            "science",
-            "sports",
-            "technology"
-        )
-        binding.categoryRv.adapter = mCategoryAdapter
-        mCategoryAdapter.submitList(categoryList)
-    }
-
-    override fun onClick(item: String) {
-        getData(country = "in",item)
     }
 
     override fun onItemClicked(item: Article) {
@@ -110,12 +112,34 @@ class HomeFragment : Fragment() , NewsItemClicked , CategoryClickListener {
         popupMenu.menuInflater.inflate(R.menu.add_more_menu,popupMenu.menu)
         popupMenu.setOnMenuItemClickListener { menuItem -> // Toast message on menu item clicked
             if (menuItem.itemId == R.id.add_to_bookmark){
-                Toast.makeText(context,"added",Toast.LENGTH_SHORT).show()
+                val database = Firebase.database.reference
+                val time  = System.currentTimeMillis()
+                val news = BookMarkNews(item.author,item.content,item.description,
+                    item.publishedAt,BookMarkNewsSource(item.source.id,item.source.name),item.title,item.url,item.urlToImage)
+                val currentUser = Firebase.auth.currentUser
+                if (currentUser != null){
+                    database.child("news")
+                        .child(currentUser.uid).child(time.toString())
+                        .setValue(news)
+                }else{
+                    Toast.makeText(requireContext(), "Please Login to bookmark news", Toast.LENGTH_SHORT).show()
+                }
             }
             true
         }
         popupMenu.show()
     }
 
-
+    private fun getCategory(position : Int) : String{
+        return when(position){
+            0 -> "general"
+            1-> "entertainment"
+            2-> "health"
+            3-> "business"
+            4-> "science"
+            5-> "sports"
+            6-> "technology"
+            else-> "null"
+        }
+    }
 }

@@ -1,65 +1,68 @@
 package com.example.newz.adapters
 
+import android.content.Intent
+import android.net.Uri
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.newz.R
-import com.example.newz.databinding.NewsListItemBinding
-import com.example.newz.model.Article
+import com.example.newz.databinding.BookmarkNewsListItemBinding
+import com.example.newz.model.BookMarkNews
 import org.ocpsoft.prettytime.PrettyTime
 import java.text.SimpleDateFormat
 import java.util.*
 
-class NewsListAdapter(private val listener : NewsItemClicked) : ListAdapter<Article, NewsListAdapter.MyViewHolder>(
-    NewsListDiffUtilCallBack()
+class BookMarkNewsListAdapter() : ListAdapter<BookMarkNews, BookMarkNewsListAdapter.MyViewHolder>(
+    BookMarkNewsListDiffUtilCallBack()
 ) {
-
-    class MyViewHolder(binding: NewsListItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class MyViewHolder(binding: BookmarkNewsListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         val title = binding.newsTitle
         val image = binding.newsImage
         val author = binding.newsAuthor
         val share = binding.shareBtn
-        val more = binding.moreBtn
         val layout = binding.container
         val time = binding.newsTime
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
-        val binding = NewsListItemBinding.inflate(layoutInflater,parent,false)
+        val binding = BookmarkNewsListItemBinding.inflate(layoutInflater,parent,false)
         return MyViewHolder(binding)
     }
-
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val item = getItem(position)
         holder.title.text = item.title
-        holder.author.text = item.source.name
-        holder.time.setText(dateTime(item.publishedAt))
+        holder.author.text = item.source?.name
+        holder.time.setText(item.publishedAt?.let { dateTime(it) })
 
         Glide.with(holder.itemView.context)
             .load(item.urlToImage)
             .thumbnail(Glide.with(holder.image.context).load(R.drawable.loading))
             .into(holder.image)
 
-        holder.more.setOnClickListener {
-            listener.onMoreBtnClicked(item , it)
-        }
-
         holder.layout.setOnClickListener {
-            listener.onItemClicked(item)
+            val builder =  CustomTabsIntent.Builder()
+            val customTabsIntent = builder.build()
+            holder.layout.context?.let { customTabsIntent.launchUrl(it, Uri.parse(item.url)) }
         }
 
         holder.share.setOnClickListener {
-            listener.onShareBtnClicked(item)
+            val sendIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_TEXT, item.url)
+                type = "text/plain"
+            }
+            val shareIntent = Intent.createChooser(sendIntent, null)
+            holder.share.context.startActivity(shareIntent)
         }
     }
 
-    fun dateTime(t : String) : String {
+    fun dateTime(t : String) : String{
         val prettyTime = PrettyTime(Locale.getDefault().country.lowercase(Locale.getDefault()))
         var time : String = ""
         try{
@@ -71,20 +74,14 @@ class NewsListAdapter(private val listener : NewsItemClicked) : ListAdapter<Arti
         }
         return time;
     }
-
 }
-class NewsListDiffUtilCallBack : DiffUtil.ItemCallback<Article>(){
-    override fun areItemsTheSame(oldItem: Article, newItem: Article): Boolean {
-        return oldItem.title == newItem.title;
+
+class BookMarkNewsListDiffUtilCallBack : DiffUtil.ItemCallback<BookMarkNews>(){
+    override fun areItemsTheSame(oldItem: BookMarkNews, newItem: BookMarkNews): Boolean {
+        return oldItem.url == newItem.url;
     }
 
-    override fun areContentsTheSame(oldItem: Article, newItem: Article): Boolean {
+    override fun areContentsTheSame(oldItem: BookMarkNews, newItem: BookMarkNews): Boolean {
         return oldItem == newItem;
     }
-}
-
-interface NewsItemClicked{
-    fun onItemClicked(item : Article)
-    fun onShareBtnClicked(item : Article)
-    fun onMoreBtnClicked(item : Article , view: View)
 }

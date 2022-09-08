@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:title="Categories">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/homeFragment"
+                    android:icon="@drawable/ic_home"
+                    android:title="@string/home" />
+
+                <item
+                    android:id="@+id/entertainmentFragment"
+                    android:icon="@drawable/ic_entertainment"
+                    android:title="@string/entertainment" />
+
+                <item
+                    android:id="@+id/healthFragment"
+                    android:icon="@drawable/ic_health"
+                    android:title="@string/health" />
+
+                <item
+                    android:id="@+id/businessFragment"
+                    android:icon="@drawable/ic_business"
+                    android:title="@string/business" />
+
+                <item
+                    android:id="@+id/scienceFragment"
+                    android:icon="@drawable/ic_science"
+                    android:title="@string/science" />
+
+                <item
+                    android:id="@+id/sportsFragment"
+                    android:icon="@drawable/ic_sports"
+                    android:title="@string/sports" />
+
+                <item
+                    android:id="@+id/technologyFragment"
+                    android:icon="@drawable/ic_technology"
+                    android:title="@string/technology" />
+            </group>
+        </menu>
+    </item>
+
+
+    <item
+        android:id="@+id/bookmarkFragment2"
+        android:icon="@drawable/ic_bookmark"
+        android:title="BookMarks" />
+
+    <item
+        android:id="@+id/signOut"
+        android:icon="@drawable/ic_signout"
+        android:title="Log Out" />
+
+</menu>
