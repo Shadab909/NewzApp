@@ -8,9 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
+import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import com.example.newz.R
 import com.example.newz.databinding.FragmentSignUpBinding
+
 import com.example.newz.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
@@ -48,14 +50,14 @@ class SignUpFragment : Fragment() {
             val password = binding.passwordEdittext.text.toString()
 
             if (name != "" && email != "" && password != ""){
-                signUpUser(name, email, password)
+                signUpUser(name, email, password , it)
             }
         }
 
         return binding.root
     }
 
-    private fun  signUpUser(name:String , email : String , password : String){
+    private fun  signUpUser(name:String , email : String , password : String , view : View){
         binding.spinKit.visibility = View.VISIBLE
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(requireActivity()) { task ->
@@ -65,14 +67,15 @@ class SignUpFragment : Fragment() {
                     val currentUser = auth.currentUser
                     database.child("users").child(currentUser!!.uid)
                         .setValue(User(
-                            name,currentUser.uid
+                            currentUser.uid,name,email
                         ))
                     binding.spinKit.visibility = View.GONE
+                    view.findNavController().navigate(SignUpFragmentDirections.actionSignUpFragmentToLoginFragment())
 
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.w("SignUpFragment", "createUserWithEmail:failure", task.exception)
-                    Toast.makeText(requireContext(), "Authentication failed.",
+                    Toast.makeText(requireContext(), "${task.exception}",
                         Toast.LENGTH_SHORT).show()
                     binding.spinKit.visibility = View.GONE
                 }

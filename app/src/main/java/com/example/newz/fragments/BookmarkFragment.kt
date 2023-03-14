@@ -28,7 +28,8 @@ class BookmarkFragment : Fragment() {
     private lateinit var binding: FragmentBookmarkBinding
     private lateinit var auth: FirebaseAuth
     private lateinit var databaseRef: DatabaseReference
-    private lateinit var list: ArrayList<BookMarkNews>
+    private lateinit var list: List<BookMarkNews>
+    private lateinit var set : HashSet<BookMarkNews>
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -38,6 +39,7 @@ class BookmarkFragment : Fragment() {
         auth = Firebase.auth
         databaseRef = Firebase.database.reference
         list = ArrayList()
+        set = HashSet()
 
 
         binding.loginBtn.setOnClickListener {
@@ -48,8 +50,9 @@ class BookmarkFragment : Fragment() {
         binding.backBtn.setOnClickListener {
             it.findNavController().popBackStack()
         }
-
-        populateRecyclerView()
+        if (auth.currentUser != null){
+            populateRecyclerView()
+        }
 
 
         return binding.root
@@ -65,14 +68,21 @@ class BookmarkFragment : Fragment() {
             .addValueEventListener(object : ValueEventListener {
                 override fun onDataChange(snapshot: DataSnapshot) {
                     for (news in snapshot.children) {
-
-                        news.getValue<BookMarkNews>()?.let { list.add(it)}
+                        news.getValue<BookMarkNews>()?.let {set.add(it)}
                     }
-                    adapter.submitList(list)
+                    list = set.toList()
+                    if(list.isEmpty()){
+                        binding.bookmarkNewsRv.visibility = View.GONE
+                        binding.emptyListIndicator.visibility = View.VISIBLE
+                    }else{
+                        binding.bookmarkNewsRv.visibility = View.VISIBLE
+                        binding.emptyListIndicator.visibility = View.GONE
+                        adapter.submitList(list)
+                    }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.d("BookMarkFragment", "onCancelled: ${error.message} ")
+                    Log.d("BookMarkFragment", "onCancelled: ${error.message}")
                 }
 
             })
@@ -85,9 +95,11 @@ class BookmarkFragment : Fragment() {
         if (user != null) {
             binding.loginBtn.visibility = View.GONE
             binding.textView.visibility = View.GONE
+            binding.title.visibility = View.VISIBLE
         } else {
             binding.loginBtn.visibility = View.VISIBLE
             binding.textView.visibility = View.VISIBLE
+            binding.title.visibility = View.GONE
         }
     }
 

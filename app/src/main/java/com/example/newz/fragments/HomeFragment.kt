@@ -3,8 +3,11 @@ package com.example.newz.fragments
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.view.ViewGroup
 import android.widget.PopupMenu
 import android.widget.Toast
@@ -31,6 +34,8 @@ class HomeFragment : Fragment() , NewsItemClicked  {
     private lateinit var binding: FragmentHomeBinding
     private lateinit var mNewsListAdapter: NewsListAdapter
     private lateinit var viewModel: HomeFragmentViewModel
+    private var pageCount = 1
+    private var totalPages = -1
 
 
     override fun onCreateView(
@@ -44,23 +49,65 @@ class HomeFragment : Fragment() , NewsItemClicked  {
         val category = getCategory(position)
         val country = "in"
         initNewsRecyclerview()
-        showData(category, country)
+        showData(category, country,pageCount)
+
+        viewModel.totalCount.observe(viewLifecycleOwner){
+            totalPages = it.toInt()
+        }
+
+        binding.nextPageButton.setOnClickListener {
+            pageCount++
+            showData(category,country,pageCount)
+            Log.d("TAG", "totalPage $totalPages")
+            if(totalPages != -1 && pageCount>=totalPages/10){
+                binding.nextPageButton.visibility = INVISIBLE
+                binding.nextPageButton.isEnabled = false
+            }
+            if(pageCount > 1){
+                binding.prevPageBtn.visibility = VISIBLE
+            }
+            binding.pageCount.text = "$pageCount  ^"
+            binding.prevPageBtn.visibility = VISIBLE
+
+        }
+
+        if (pageCount == 1) binding.prevPageBtn.visibility = INVISIBLE
+        else binding.prevPageBtn.visibility = VISIBLE
+
+        binding.prevPageBtn.setOnClickListener {
+
+            if (pageCount>1){
+                pageCount--
+                showData(category,country,pageCount)
+                binding.pageCount.text = "$pageCount  ^"
+            }
+            if (pageCount<=1){
+                binding.prevPageBtn.visibility = INVISIBLE
+            }
+            if (totalPages != -1 && pageCount<totalPages/10+1){
+                binding.nextPageButton.visibility = VISIBLE
+                binding.nextPageButton.isEnabled = true
+            }
+
+        }
+
+
 
         binding.swipeRefresh.setOnRefreshListener {
-            showData(category, country)
-            binding.swipeRefresh.isRefreshing = false;
+            showData(category, country , pageCount)
+            binding.swipeRefresh.isRefreshing = false
         }
 
 
         return binding.root
     }
 
-    private fun showData(category : String , country : String )
+    private fun showData(category : String , country : String , page : Int )
     {
         if(MyUtil.isInternetAvailable(requireContext())){
             binding.noInternet.visibility = View.GONE
             binding.newsListRv.visibility = View.VISIBLE
-            getData(country,category)
+            getData(country,category,page)
         }else{
             binding.noInternet.visibility = View.VISIBLE
             binding.spinKit.visibility = View.GONE
@@ -76,7 +123,7 @@ class HomeFragment : Fragment() , NewsItemClicked  {
         }
     }
 
-    private fun getData(country : String ,category : String){
+    private fun getData(country : String ,category : String,page : Int){
         binding.spinKit.visibility = View.VISIBLE
         binding.newsListRv.visibility = View.GONE
         viewModel.getNewsListDataObserver().observe(viewLifecycleOwner) {
@@ -88,7 +135,7 @@ class HomeFragment : Fragment() , NewsItemClicked  {
             binding.newsListRv.visibility = View.VISIBLE
             binding.spinKit.visibility = View.GONE
         }
-        viewModel.makeApiCall(country,category)
+        viewModel.makeApiCall(country,category,page)
     }
 
     override fun onItemClicked(item: Article) {
@@ -143,3 +190,4 @@ class HomeFragment : Fragment() , NewsItemClicked  {
         }
     }
 }
+

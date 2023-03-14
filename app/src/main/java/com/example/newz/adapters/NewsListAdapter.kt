@@ -39,12 +39,20 @@ class NewsListAdapter(private val listener : NewsItemClicked) : ListAdapter<Arti
         val item = getItem(position)
         holder.title.text = item.title
         holder.author.text = item.source.name
-        holder.time.setText(dateTime(item.publishedAt))
+        holder.time.text = dateTime(item.publishedAt)
 
-        Glide.with(holder.itemView.context)
-            .load(item.urlToImage)
-            .thumbnail(Glide.with(holder.image.context).load(R.drawable.loading))
-            .into(holder.image)
+        if(item.urlToImage == null){
+            Glide.with(holder.itemView.context)
+                .load(R.drawable.news_placeholder_image)
+                .into(holder.image)
+        }else{
+            Glide.with(holder.itemView.context)
+                .load(item.urlToImage)
+                .thumbnail(Glide.with(holder.image.context).load(R.drawable.loading))
+                .into(holder.image)
+        }
+
+
 
         holder.more.setOnClickListener {
             listener.onMoreBtnClicked(item , it)
@@ -59,7 +67,7 @@ class NewsListAdapter(private val listener : NewsItemClicked) : ListAdapter<Arti
         }
     }
 
-    fun dateTime(t : String) : String {
+    private fun dateTime(t : String) : String {
         val prettyTime = PrettyTime(Locale.getDefault().country.lowercase(Locale.getDefault()))
         var time : String = ""
         try{

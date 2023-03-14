@@ -41,8 +41,8 @@ class BookMarkNewsListAdapter() : ListAdapter<BookMarkNews, BookMarkNewsListAdap
         holder.time.setText(item.publishedAt?.let { dateTime(it) })
 
         Glide.with(holder.itemView.context)
-            .load(item.urlToImage)
-            .thumbnail(Glide.with(holder.image.context).load(R.drawable.loading))
+            .load(R.drawable.news_placeholder_image)
+//            .thumbnail(Glide.with(holder.image.context).load(R.drawable.loading))
             .into(holder.image)
 
         holder.layout.setOnClickListener {
@@ -62,7 +62,7 @@ class BookMarkNewsListAdapter() : ListAdapter<BookMarkNews, BookMarkNewsListAdap
         }
     }
 
-    fun dateTime(t : String) : String{
+    private fun dateTime(t : String) : String{
         val prettyTime = PrettyTime(Locale.getDefault().country.lowercase(Locale.getDefault()))
         var time : String = ""
         try{
