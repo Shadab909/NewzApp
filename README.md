@@ -5,10 +5,10 @@ the Application use [News API](https://newsapi.org/) to get news
 
 ## Screenshots
 
-
+<div style="border:1px solid red">
 <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678813883/01_jjosyj.jpg" width="250"> &nbsp; &nbsp; &nbsp; <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678813925/02_cnbztg.jpg" width="250"> &nbsp; &nbsp; <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678813935/03_h5jxzm.jpg" width="250"> 
-<br>
-<hr style="color:red" >
+ </div>
+
 <br>
 <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678813962/04_zpdxo7.jpg" width="250"> &nbsp; &nbsp; &nbsp;  <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678813970/05_ytiqip.jpg" width="250"> &nbsp; &nbsp; <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678813989/06_ipqoqj.jpg" width="250">
 <br>
