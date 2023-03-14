@@ -5,6 +5,16 @@ the Application use [News API](https://newsapi.org/) to get news
 
 ## Screenshots
 
+<div>
+ <style>
+   h1{
+    color:red;
+  }
+ </style>
+ <h1>hello </h1>
+ 
+ </div>
+
 <div style="border:1px solid red">
 <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678813883/01_jjosyj.jpg" width="250"> &nbsp; &nbsp; &nbsp; <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678813925/02_cnbztg.jpg" width="250"> &nbsp; &nbsp; <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678813935/03_h5jxzm.jpg" width="250"> 
  </div>
@@ -20,6 +30,9 @@ the Application use [News API](https://newsapi.org/) to get news
 <br>
 <br>
 <img src="https://res.cloudinary.com/dxohkfifk/image/upload/v1678814058/13_dyzlt3.jpg" width="250">
+
+
+
 
 
 ## features
