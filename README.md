@@ -3,6 +3,25 @@
 NewsApp is android app using Kotlin with MVVM architecture
 the Application use [News API](https://newsapi.org/) to get news
 
+
+## Features
+- get top , latest and trending News
+- get news headlines category wise
+- bookmark news using firebase database
+- share news with others
+
+
+### Libraries used :
+- retrofit2
+- viewModel , LifeData
+- DataBinding
+- Gson
+- Glide
+- Swipe Refresh Layout
+- DiffUtil
+- room
+- Material Design
+
 ## Screenshots
 
 <p float="left">
@@ -35,21 +54,3 @@ the Application use [News API](https://newsapi.org/) to get news
 <br>
 <br>
 
-
-## features
-- get top , latest and trending News
-- get news headlines category wise
-- bookmark news using firebase database
-- share news with others
-
-
-### libraries used :
-- retrofit2
-- viewModel , LifeData
-- DataBinding
-- Gson
-- Glide
-- Swipe Refresh Layout
-- DiffUtil
-- room
-- Material Design
